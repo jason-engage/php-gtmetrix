@@ -112,7 +112,7 @@ class GTMetrixClient
         }
 
         if ($json) {
-            $data = json_decode($result, true);
+            $data = json_decode($result, true)['data'];
             if (json_last_error()) {
                 throw new GTMetrixException('Invalid JSON received: ' . json_last_error_msg());
             }
