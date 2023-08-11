@@ -100,7 +100,7 @@ class GTMetrixClient
 			
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);			
         }
-		
+
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -208,27 +208,33 @@ class GTMetrixClient
     {
 
         $data = array();
-        $data['url'] = $url;
+		$data['type'] = "test",
+        $data['attributes']['url'] = $url;
         if ($location) {
-            $data['location'] = $location;
+            $data['attributes']['location'] = $location;
         }
         if ($browser) {
-            $data['browser'] = $browser;
+            $data['attributes']['browser'] = $browser;
         }
         if ($httpUser) {
-            $data['login-user'] = $httpUser;
+            $data['attributes']['login-user'] = $httpUser;
         }
         if ($httpPassword) {
-            $data['login-pass'] = $httpPassword;
+            $data['attributes']['login-pass'] = $httpPassword;
         }
         if ($xParams) {
             $data = array_merge($data, $xParams);
         }
-        $result = $this->apiCall('/tests', $data);
+		
+        $result = $this->apiCall('/tests', ['data'=>$data]);
+
+		var_dump($result);
 
         $test = new GTMetrixTest();
+
         $test->setId($result['id']);
-        $test->setPollStateUrl($result['poll_state_url']);
+        
+		// $test->setPollStateUrl($result['poll_state_url']);
 
         return $test;
     }
