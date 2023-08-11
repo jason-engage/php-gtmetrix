@@ -217,10 +217,10 @@ class GTMetrixClient
         if ($xParams) {
             $data = array_merge($data, $xParams);
         }
-        $result = $this->apiCall('/test', $data);
+        $result = $this->apiCall('/tests', $data);
 
         $test = new GTMetrixTest();
-        $test->setId($result['test_id']);
+        $test->setId($result['id']);
         $test->setPollStateUrl($result['poll_state_url']);
 
         return $test;
@@ -272,4 +272,12 @@ class GTMetrixClient
 
         return $test;
     }
+
+
+
+	public function getTestsList() {
+
+		return $this->apiCall('/tests');
+
+	}
 }
