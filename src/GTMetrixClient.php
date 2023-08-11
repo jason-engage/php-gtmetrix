@@ -112,7 +112,7 @@ class GTMetrixClient
         }
 
         if ($json) {
-            $data = json_decode($result, true)['data'];
+            $data = json_decode($result, true)['data'] ?? [];
             if (json_last_error()) {
                 throw new GTMetrixException('Invalid JSON received: ' . json_last_error_msg());
             }
@@ -247,27 +247,27 @@ class GTMetrixClient
         if ($test->getState() == GTMetrixTest::STATE_COMPLETED) {
 			$test->setData($testStatus);
 
-            $test->setReportUrl($testStatus['results']['report_url']);
-            $test->setPagespeedScore($testStatus['results']['pagespeed_score']);
-            $test->setYslowScore($testStatus['results']['yslow_score']);
-            $test->setHtmlBytes($testStatus['results']['html_bytes']);
-            $test->setHtmlLoadTime($testStatus['results']['html_load_time']);
-            $test->setPageBytes($testStatus['results']['page_bytes']);
-            $test->setPageLoadTime($testStatus['results']['page_load_time']);
-            $test->setPageElements($testStatus['results']['page_elements']);
-            $test->setRedirectDuration($testStatus['results']['redirect_duration']);
-            $test->setConnectDuration($testStatus['results']['connect_duration']);
-            $test->setBackendDuration($testStatus['results']['backend_duration']);
-            $test->setFirstPaintTime($testStatus['results']['first_paint_time']);
-            $test->setFirstContentfulPaintTime($testStatus['results']['first_contentful_paint_time']);
-            $test->setDomInteractiveTime($testStatus['results']['dom_interactive_time']);
-            $test->setDomContentLoadedTime($testStatus['results']['dom_content_loaded_time']);
-            $test->setDomContentLoadedDuration($testStatus['results']['dom_content_loaded_duration']);
-            $test->setOnloadTime($testStatus['results']['onload_time']);
-            $test->setOnloadDuration($testStatus['results']['onload_duration']);
-            $test->setFullyLoadedTime($testStatus['results']['fully_loaded_time']);
-            $test->setRumSpeedIndex($testStatus['results']['rum_speed_index']);
-            $test->setResources($testStatus['resources']);
+            // $test->setReportUrl($testStatus['results']['report_url']);
+            // $test->setPagespeedScore($testStatus['results']['pagespeed_score']);
+            // $test->setYslowScore($testStatus['results']['yslow_score']);
+            // $test->setHtmlBytes($testStatus['results']['html_bytes']);
+            // $test->setHtmlLoadTime($testStatus['results']['html_load_time']);
+            // $test->setPageBytes($testStatus['results']['page_bytes']);
+            // $test->setPageLoadTime($testStatus['results']['page_load_time']);
+            // $test->setPageElements($testStatus['results']['page_elements']);
+            // $test->setRedirectDuration($testStatus['results']['redirect_duration']);
+            // $test->setConnectDuration($testStatus['results']['connect_duration']);
+            // $test->setBackendDuration($testStatus['results']['backend_duration']);
+            // $test->setFirstPaintTime($testStatus['results']['first_paint_time']);
+            // $test->setFirstContentfulPaintTime($testStatus['results']['first_contentful_paint_time']);
+            // $test->setDomInteractiveTime($testStatus['results']['dom_interactive_time']);
+            // $test->setDomContentLoadedTime($testStatus['results']['dom_content_loaded_time']);
+            // $test->setDomContentLoadedDuration($testStatus['results']['dom_content_loaded_duration']);
+            // $test->setOnloadTime($testStatus['results']['onload_time']);
+            // $test->setOnloadDuration($testStatus['results']['onload_duration']);
+            // $test->setFullyLoadedTime($testStatus['results']['fully_loaded_time']);
+            // $test->setRumSpeedIndex($testStatus['results']['rum_speed_index']);
+            // $test->setResources($testStatus['resources']);
         }
 
         return $test;

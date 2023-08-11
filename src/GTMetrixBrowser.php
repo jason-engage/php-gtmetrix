@@ -13,6 +13,11 @@ class GTMetrixBrowser {
 	protected $id;
 
 	/**
+	 * @var data
+	 */
+	protected $data;
+
+	/**
 	 * @var string
 	 */
 	protected $name;
@@ -49,6 +54,20 @@ class GTMetrixBrowser {
 	 */
 	public function setId($id) {
 		$this->id = $id;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getData() {
+		return $this->data;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	public function setData($data) {
+		$this->data = $data;
 	}
 
 	/**
@@ -134,19 +153,22 @@ class GTMetrixBrowser {
 	 * @param array $data
 	 */
 	public function fromArray($data) {
-		$this->setId($data['id']);
-		$this->setName($data['name']);
-		$this->setBrowser($data['browser']);
-		$this->setDevice($data['device']);
 
-		$features = array();
-		foreach ($data['features'] as $feature => $supported) {
-			if ($supported) {
-				$features[] = $feature;
-			}
-		}
-		$this->setFeatures($features);
-		$this->setPlatform($data['platform']);
+		$this->setData($data);
+
+		// $this->setId($data['id']);
+		// $this->setName($data['name']);
+		// $this->setBrowser($data['browser']);
+		// $this->setDevice($data['device']);
+
+		// $features = array();
+		// foreach ($data['features'] as $feature => $supported) {
+		// 	if ($supported) {
+		// 		$features[] = $feature;
+		// 	}
+		// }
+		// $this->setFeatures($features);
+		// $this->setPlatform($data['platform']);
 	}
 
 	/**

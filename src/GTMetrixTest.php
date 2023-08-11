@@ -160,14 +160,14 @@ class GTMetrixTest {
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function getData() {
 		return $this->data;
 	}
 
 	/**
-	 * @param string $id
+	 * @param array $data
 	 */
 	public function setData($data) {
 		$this->data = $data;

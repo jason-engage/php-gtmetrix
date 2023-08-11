@@ -11,6 +11,12 @@ class GTMetrixLocation {
 	 * @var string
 	 */
 	protected $id;
+
+	/**
+	 * @var array
+	 */
+	protected $data;
+
 	/**
 	 * @var string
 	 */
@@ -37,6 +43,20 @@ class GTMetrixLocation {
 	 */
 	public function setId($id) {
 		$this->id = $id;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getData() {
+		return $this->data;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	public function setData($data) {
+		$this->data = $data;
 	}
 
 	/**
@@ -85,10 +105,12 @@ class GTMetrixLocation {
 	 * @param array $data
 	 */
 	public function fromArray($data) {
-		$this->setId($data['id']);
-		$this->setName($data['name']);
-		$this->setDefault($data['default']);
-		$this->setBrowserIds($data['browsers']);
+		
+		$this->setData($data);
+		// $this->setId($data['id']);
+		// $this->setName($data['name']);
+		// $this->setDefault($data['default']);
+		// $this->setBrowserIds($data['browsers']);
 	}
 
 	/**
