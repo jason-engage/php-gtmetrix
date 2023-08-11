@@ -29,7 +29,7 @@ class GTMetrixClient {
 	 *
 	 * @var string
 	 */
-	protected $endpoint = 'https://gtmetrix.com/api/0.1';
+	protected $endpoint = 'https://gtmetrix.com/api/2.0';
 
 	/**
 	 * GTMetrix username
