@@ -1,5 +1,5 @@
 {
-	"name": "jasonengage/gtmetrix",
+	"name": "jason-engage/gtmetrix",
 	"description": "GTMetrix API 2.0 client for PHP",
 	"license": "MIT",
 	"autoload": {
