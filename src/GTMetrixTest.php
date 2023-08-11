@@ -18,6 +18,11 @@ class GTMetrixTest {
 	protected $id;
 
 	/**
+	 * @var array
+	 */
+	protected $data;
+
+	/**
 	 * @var string
 	 */
 	protected $pollStateUrl;
@@ -152,6 +157,20 @@ class GTMetrixTest {
 	 */
 	public function setId($id) {
 		$this->id = $id;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getData() {
+		return $this->data;
+	}
+
+	/**
+	 * @param string $id
+	 */
+	public function setData($data) {
+		$this->data = $data;
 	}
 
 	/**
