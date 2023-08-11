@@ -1,6 +1,6 @@
 {
-	"name": "philcook/gtmetrix",
-	"description": "GTMetrix API client for PHP",
+	"name": "jasonengage/gtmetrix",
+	"description": "GTMetrix API 2.0 client for PHP",
 	"license": "MIT",
 	"autoload": {
 		"psr-4": {
