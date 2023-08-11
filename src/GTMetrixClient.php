@@ -208,7 +208,7 @@ class GTMetrixClient
     {
 
         $data = array();
-		$data['type'] = "test",
+		$data['type'] = "test";
         $data['attributes']['url'] = $url;
         if ($location) {
             $data['attributes']['location'] = $location;
@@ -225,7 +225,7 @@ class GTMetrixClient
         if ($xParams) {
             $data = array_merge($data, $xParams);
         }
-		
+
         $result = $this->apiCall('/tests', ['data'=>$data]);
 
 		var_dump($result);
