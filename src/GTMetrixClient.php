@@ -95,9 +95,9 @@ class GTMetrixClient
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
         }
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($ch, CURLOPT_USERPWD, $this->username . ':' . $this->apiKey);
+        curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CAINFO, dirname(__DIR__) . '/data/ca-bundle.crt');
+        // curl_setopt($ch, CURLOPT_CAINFO, dirname(__DIR__) . '/data/ca-bundle.crt');
         $result = curl_exec($ch);
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlErrNo = curl_errno($ch);
