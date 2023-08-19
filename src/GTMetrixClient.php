@@ -8,21 +8,18 @@ namespace LightningStudio\GTMetrixClient;
  * Usage:
  *
  *     $client = new GTMetrixClient();
- *     $client->setUsername('your@email.com');
  *     $client->setAPIKey('your-gtmetrix-api-key');
- *
- *     $client->getLocations();
- *     $client->getBrowsers();
- *     $test = $client->startTest();
- *
- *     //Wait for result
- * 	   while ($test->getState() != GTMetrixTest::STATE_COMPLETED &&
- *         $test->getState() != GTMetrixTest::STATE_ERROR) {
- *         $client->getTestStatus($test);
- *         sleep(5);
+ *     
+ *     try {
+ *         $test = $client->startTest($url);
+ *         echo $test;
+ *     } catch (Exception $e) {
+ *         echo 'Error: ' . $e->getMessage();
  *     }
- *
- */
+ * 
+*/
+
+
 class GTMetrixClient
 {
     /**
@@ -33,13 +30,6 @@ class GTMetrixClient
     protected $endpoint = 'https://gtmetrix.com/api/2.0';
 
     /**
-     * GTMetrix username
-     *
-     * @var string
-     */
-    protected $username = '';
-
-    /**
      * GTMetrix API key.
      *
      * @var string
@@ -48,21 +38,6 @@ class GTMetrixClient
      */
     protected $apiKey = '';
 
-    /**
-     * @return string
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
 
     /**
      * @return string
@@ -73,26 +48,39 @@ class GTMetrixClient
     }
 
     /**
+     * @param string $apiKey
+     */
+    public function setAPIKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+    }
+
+
+    /**
      * @param string $url
      * @param array $data
-     * @param bool  $json
      *
-     * @return array|string
+     * @return array
      *
      * @throws GTMetrixConfigurationException
      * @throws GTMetrixException
      */
-    protected function apiCall($url, $data = array(), $json = true)
+    protected function apiCall($url, $data = array(), $method = null)
     {
-        if (!$this->username || !$this->apiKey) {
-            throw new GTMetrixConfigurationException('Username and API key must be set up before using API calls!' .
-                'See setUsername() and setAPIKey() for details.');
+        if (!$this->apiKey) {
+            throw new GTMetrixConfigurationException('API key must be set up before using API calls!' .
+                'See setAPIKey() for details.');
         }
 
         $ch = curl_init($this->endpoint . $url);
-        if (!empty($data)) {
+
+        if ($method === 'DELETE') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        }
+
+        if ( !empty($data) ) {
             curl_setopt($ch, CURLOPT_POST, count($data));
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
 			$headers = [
 				'Content-Type: application/vnd.api+json', // The specific content type required
@@ -118,43 +106,188 @@ class GTMetrixClient
             throw new GTMetrixException('API error ' . $statusCode . ': ' . $result);
         }
 
-        if ($json) {
-            $data = json_decode($result, true)['data'] ?? [];
-            if (json_last_error()) {
-                throw new GTMetrixException('Invalid JSON received: ' . json_last_error_msg());
-            }
-        } else {
-            $data = $result;
+        $data = json_decode($result, true)['data'] ?? [];
+        
+        if (json_last_error()) {
+            throw new GTMetrixException('Invalid JSON received: ' . json_last_error_msg());
         }
-
+        
         return $data;
     }
-
+    
     /**
-     * @param string $apiKey
-     */
-    public function setAPIKey($apiKey)
-    {
-        $this->apiKey = $apiKey;
-    }
-
-    /**
-     * @return GTMetrixLocation[]
+     * @param string $url
      *
-     * @throws GTMetrixConfigurationException
+     * @return array || string
      */
-    public function getLocations()
-    {
-        $result = $this->apiCall('/locations');
+    public function fetchUrlData($url) {
 
-        $locations = array();
-        foreach ($result as $locationData) {
-            $location = new GTMetrixLocation();
-            $location->fromArray($locationData);
-            $locations[] = $location;
+        if (!$this->apiKey) {
+            throw new GTMetrixConfigurationException('API key must be set up before using API calls!' .
+                'See setAPIKey() for details.');
         }
-        return $locations;
+
+        // Initialize cURL session
+        $ch = curl_init($url);
+    
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        // Execute cURL session
+        $response = curl_exec($ch);
+    
+        // Get the content type from the response
+        $content_type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    
+        // Separate the header and the body
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
+    
+        // Close cURL session
+        curl_close($ch);
+    
+        // Check if the content type is JSON
+        if ( stripos($content_type, 'application/json') !== false ) {
+            return json_decode($body, true);
+        }
+    
+        return $body;
     }
+
+
+
+
+    /**
+     * Start a GTMetrix test
+     *
+     * @param string $url
+     * @param array		$xParams
+     *
+     * @return GTMetrixTest
+     * @throws GTMetrixConfigurationException
+     * @throws GTMetrixException
+     */
+
+     
+    public function startTest($url, array $xParams = [], $wait_for_completion = true)
+    {
+
+        $test = new GTMetrixTest();
+
+        $params = $test->buildParams($url, $xParams);
+        
+        $result = $this->apiCall('/tests', ['data'=>$params]);
+
+        $test->setData($result);
+        
+        if ($wait_for_completion) { 
+            error_log("Waiting for test to complete");
+            sleep(2);
+            $test = $this->waitForTest( $test );
+        }
+
+        return $test;
+    }
+
+	public function getTests() {
+		return $this->apiCall('/tests');
+	}
+
+    public function getTest($id) {
+        
+        $data = [];
+        
+        if ($id) {
+            $data = $this->apiCall('/tests/' . $id);
+        }
+
+        return new GTMetrixTest($data);
+
+    }
+
+    public function deleteTest($id) {
+        return $this->apiCall( '/tests/' . $id, [], "DELETE" );
+    }
+
+    //INCLUDES LOOP FOR WAITING UNTIL COMPLETE
+    public function waitForTest($test) {
+
+        $maxRetries = 15; // You can set an appropriate value for max retries
+        $retryCount = 0;
+    
+        // Wait for result
+        while ($test->getState() !== GTMetrixTest::STATE_COMPLETED && $retryCount < $maxRetries) {
+            $test = $this->getTest($test->getId()); // Assuming this function fetches the test data
+            
+            if ( empty($test->getData()) ) {                
+                error_log("Test data is empty?");
+                break;
+            }
+
+            if ($test->getState() === GTMetrixTest::STATE_COMPLETED) {
+                error_log("Test is ready");
+                continue;
+            }
+
+            error_log("Still waiting");
+            sleep(5);
+            $retryCount++;
+        }
+    
+        if ($retryCount >= $maxRetries) {
+            error_log("Max retries reached");
+            return $test;
+        }
+    
+        return $test;
+    }
+    
+
+    /**
+     * GTMetrix reports
+    */
+
+    public function getReport($id) {
+        
+        $data = [];
+
+        if ($id) {
+            $data = $this->apiCall('/reports/' . $id);
+        }
+
+        return new GTMetrixReport($data);
+    }
+
+    public function deleteReport($id) {
+        return $this->apiCall( '/reports/' . $id, [], "DELETE" );
+    }
+
+
+    public function getSimulatedDevices() {
+		return $this->apiCall('/simulated-devices');
+	}
+
+    
+    public function getSimulatedDevice($id) {
+        $data = [];
+
+        if ($id) {
+            $data = $this->apiCall('/simulated-devices/' . $id);
+        }
+
+        return new GTMetrixLocation($data);
+
+	}
+    
+
+
 
     /**
      * @return GTMetrixBrowser[]
@@ -163,15 +296,8 @@ class GTMetrixClient
      */
     public function getBrowsers()
     {
-        $result = $this->apiCall('/browsers');
+        return $this->apiCall('/browsers');
 
-        $browsers = array();
-        foreach ($result as $browserData) {
-            $browser = new GTMetrixBrowser();
-            $browser->fromArray($browserData);
-            $browsers[] = $browser;
-        }
-        return $browsers;
     }
 
     /**
@@ -183,114 +309,34 @@ class GTMetrixClient
      */
     public function getBrowser($id)
     {
-        $result = $this->apiCall('/browsers/' . urlencode($id));
-        $browser = new GTMetrixBrowser();
-        $browser->fromArray($result);
-        return $browser;
+        $data = [];
+
+        if ($id) {
+            $data = $this->apiCall('/browsers/' . $id);
+        }
+
+        return new GTMetrixBrowser($data);
     }
 
-    /**
-     * Start a GTMetrix test
+
+        /**
+     * @return GTMetrixLocation[]
      *
-     * @param string $url
-     *
-     * @param null|string   $location
-     * @param null|string   $browser
-     * @param null|string   $httpUser
-     * @param null|string   $httpPassword
-     * @param array		$xParams
-     *
-     * @return GTMetrixTest
      * @throws GTMetrixConfigurationException
-     * @throws GTMetrixException
      */
-    public function startTest($url, $location = null, $browser = null, $httpUser = null, $httpPassword = null, array $xParams = [])
+    public function getLocations()
     {
-
-        $data = array();
-		$data['type'] = "test";
-        $data['attributes']['url'] = $url;
-        if ($location) {
-            $data['attributes']['location'] = $location;
-        }
-        if ($browser) {
-            $data['attributes']['browser'] = $browser;
-        }
-        if ($httpUser) {
-            $data['attributes']['login-user'] = $httpUser;
-        }
-        if ($httpPassword) {
-            $data['attributes']['login-pass'] = $httpPassword;
-        }
-        if ($xParams) {
-            $data = array_merge($data, $xParams);
-        }
-
-        $result = $this->apiCall('/tests', ['data'=>$data]);
-
-		var_dump($result);
-
-        $test = new GTMetrixTest();
-
-        $test->setId($result['id']);
-        
-		// $test->setPollStateUrl($result['poll_state_url']);
-
-        return $test;
+        return $this->apiCall('/locations');
     }
 
-    /**
-     * @param GTMetrixTest|string $test GTMetrixTest or test ID. This object will be updated
-     *
-     * @return GTMetrixTest
-     */
-    public function getTestStatus($test)
+    public function getLocation($id)
     {
-        if ($test instanceof GTMetrixTest) {
-            $testId = $test->getId();
-        } else {
-            $testId = $test;
-            $test = new GTMetrixTest();
-            $test->setId($testId);
+        $data = [];
+
+        if ($id) {
+            $data = $this->apiCall('/locations/' . $id);
         }
 
-        $testStatus = $this->apiCall('/test/' . urlencode($testId));
-        $test->setState($testStatus['state']);
-        $test->setError($testStatus['error']);
-        if ($test->getState() == GTMetrixTest::STATE_COMPLETED) {
-			$test->setData($testStatus);
-
-            // $test->setReportUrl($testStatus['results']['report_url']);
-            // $test->setPagespeedScore($testStatus['results']['pagespeed_score']);
-            // $test->setYslowScore($testStatus['results']['yslow_score']);
-            // $test->setHtmlBytes($testStatus['results']['html_bytes']);
-            // $test->setHtmlLoadTime($testStatus['results']['html_load_time']);
-            // $test->setPageBytes($testStatus['results']['page_bytes']);
-            // $test->setPageLoadTime($testStatus['results']['page_load_time']);
-            // $test->setPageElements($testStatus['results']['page_elements']);
-            // $test->setRedirectDuration($testStatus['results']['redirect_duration']);
-            // $test->setConnectDuration($testStatus['results']['connect_duration']);
-            // $test->setBackendDuration($testStatus['results']['backend_duration']);
-            // $test->setFirstPaintTime($testStatus['results']['first_paint_time']);
-            // $test->setFirstContentfulPaintTime($testStatus['results']['first_contentful_paint_time']);
-            // $test->setDomInteractiveTime($testStatus['results']['dom_interactive_time']);
-            // $test->setDomContentLoadedTime($testStatus['results']['dom_content_loaded_time']);
-            // $test->setDomContentLoadedDuration($testStatus['results']['dom_content_loaded_duration']);
-            // $test->setOnloadTime($testStatus['results']['onload_time']);
-            // $test->setOnloadDuration($testStatus['results']['onload_duration']);
-            // $test->setFullyLoadedTime($testStatus['results']['fully_loaded_time']);
-            // $test->setRumSpeedIndex($testStatus['results']['rum_speed_index']);
-            // $test->setResources($testStatus['resources']);
-        }
-
-        return $test;
+        return new GTMetrixLocation($data);
     }
-
-
-
-	public function getTestsList() {
-
-		return $this->apiCall('/tests');
-
-	}
 }

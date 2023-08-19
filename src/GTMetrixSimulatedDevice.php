@@ -4,10 +4,11 @@
 namespace LightningStudio\GTMetrixClient;
 
 /**
- * GTMetrix location object.
+ * GTMetrix SimulatedDevice object
  */
-class GTMetrixLocation {
+class GTMetrixSimulatedDevice {
 	
+
 	/**
 	 * @var data
 	 */
@@ -49,25 +50,40 @@ class GTMetrixLocation {
 		return $this->data['attributes']['name'] ?? "";
 	}
 
+
 	/**
 	 * @return string
 	 */
-	public function getRegion() {
-		return $this->data['attributes']['region'] ?? "";
+	public function getCategory() {
+		return $this->data['attributes']['category'] ?? "";
 	}
 
 	/**
-	 * @return boolean
+	 * @return string
 	 */
-	public function isDefault() {
-		return $this->data['attributes']['default'] ?? false;
+	public function getUserAgent() {
+		return $this->data['attributes']['user_agent'] ?? "";
 	}
 
 	/**
-	 * @return string[]
+	 * @return string
 	 */
-	public function getBrowserIds() {
-		return $this->data['attributes']['browsers'] ?? [];
+	public function getManufacturer() {
+		return $this->data['attributes']['manufacturer'] ?? "";
+	}
+
+    /**
+	 * @return string
+	 */
+	public function getHeight() {
+		return $this->data['attributes']['height'] ?? 0;
+	}
+
+    /**
+	 * @return string
+	 */
+	public function getWidth() {
+		return $this->data['attributes']['width'] ?? 0;
 	}
 
 	/**

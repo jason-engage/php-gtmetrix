@@ -7,10 +7,7 @@ namespace LightningStudio\GTMetrixClient;
  * GTMetrix browser object
  */
 class GTMetrixBrowser {
-	/**
-	 * @var string
-	 */
-	protected $id;
+	
 
 	/**
 	 * @var data
@@ -18,126 +15,61 @@ class GTMetrixBrowser {
 	protected $data;
 
 	/**
-	 * @var string
+	 * @param array $data
 	 */
-	protected $name;
-
-	/**
-	 * @var string
-	 */
-	protected $platform;
-
-	/**
-	 * @var string
-	 */
-	protected $device;
-
-	/**
-	 * @var string
-	 */
-	protected $browser;
-
-	/**
-	 * @var array
-	 */
-	protected $features;
-
-	/**
-	 * @return string
-	 */
-	public function getId() {
-		return $this->id;
+    public function setData($data) {
+		return $this->data = $data;
 	}
 
 	/**
 	 * @param string $id
 	 */
 	public function setId($id) {
-		$this->id = $id;
+		$this->data['id'] = $id;
 	}
+    
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function getData() {
 		return $this->data;
 	}
 
 	/**
-	 * @param array $data
+	 * @return string
 	 */
-	public function setData($data) {
-		$this->data = $data;
+	public function getId() {
+		return $this->data['id'] ?? null;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getName() {
-		return $this->name;
+		return $this->data['attributes']['name'] ?? "";
 	}
 
-	/**
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
 
 	/**
 	 * @return string
 	 */
 	public function getPlatform() {
-		return $this->platform;
-	}
-
-	/**
-	 * @param string $platform
-	 */
-	public function setPlatform($platform) {
-		$this->platform = $platform;
+		return $this->data['attributes']['platform'] ?? "";
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getDevice() {
-		return $this->device;
-	}
-
-	/**
-	 * @param string $device
-	 */
-	public function setDevice($device) {
-		$this->device = $device;
+		return $this->data['attributes']['device'] ?? "";
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getBrowser() {
-		return $this->browser;
-	}
-
-	/**
-	 * @param string $browser
-	 */
-	public function setBrowser($browser) {
-		$this->browser = $browser;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getFeatures() {
-		return $this->features;
-	}
-
-	/**
-	 * @param array $features
-	 */
-	public function setFeatures($features) {
-		$this->features = $features;
+		return $this->data['attributes']['browser'] ?? "";
 	}
 
 	/**
@@ -146,36 +78,18 @@ class GTMetrixBrowser {
 	 * @return bool
 	 */
 	public function hasFeature($feature) {
-		return (\array_search($feature, $this->features) !== false);
-	}
-
-	/**
-	 * @param array $data
-	 */
-	public function fromArray($data) {
-
-		$this->setData($data);
-
-		// $this->setId($data['id']);
-		// $this->setName($data['name']);
-		// $this->setBrowser($data['browser']);
-		// $this->setDevice($data['device']);
-
-		// $features = array();
-		// foreach ($data['features'] as $feature => $supported) {
-		// 	if ($supported) {
-		// 		$features[] = $feature;
-		// 	}
-		// }
-		// $this->setFeatures($features);
-		// $this->setPlatform($data['platform']);
+		return !empty($this->data['attributes'][$feature]);
 	}
 
 	/**
 	 * @return string
 	 */
 	public function __toString() {
-		return $this->getId();
+		return json_encode( $this->getData(), JSON_PRETTY_PRINT );
+	}
+
+	public function __construct($data = []) {
+		$this->setData($data);
 	}
 
 }

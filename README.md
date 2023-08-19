@@ -1,36 +1,27 @@
-# GTMetrix API client for PHP
-
-[![Latest Stable Version](https://poser.pugx.org/philcook/gtmetrix/v)](//packagist.org/packages/philcook/gtmetrix)
-[![Build Status](https://travis-ci.org/philcook/php-gtmetrix.svg)](https://travis-ci.org/philcook/php-gtmetrix)
-[![Total Downloads](https://poser.pugx.org/philcook/gtmetrix/downloads)](//packagist.org/packages/philcook/gtmetrix)
-[![License](https://poser.pugx.org/philcook/gtmetrix/license)](//packagist.org/packages/philcook/gtmetrix)
+# GTMetrix API 2.0 client for PHP
 
 ## Installing
 
-This client library can be installed using [composer](https://getcomposer.org/):
+Fork and ask ChatGPT how to install to composer using custom dev repository
 
-    composer require philcook/gtmetrix
-    
+Rebuilt for API 2.0 using philcook/gtmetrix - it is not backwards compatible and will break existing code.
+
 ## Using
 
 ```php
 use LightningStudio\GTMetrixClient\GTMetrixClient;
-use LightningStudio\GTMetrixClient\GTMetrixTest;
 
 $client = new GTMetrixClient();
-$client->setUsername('your@email.com');
 $client->setAPIKey('your-gtmetrix-api-key');
-
-$client->getLocations();
-$client->getBrowsers();
-$test = $client->startTest('http://www.example.com/');
- 
-//Wait for result
-while ($test->getState() != GTMetrixTest::STATE_COMPLETED &&
-    $test->getState() != GTMetrixTest::STATE_ERROR) {
-    $client->getTestStatus($test);
-    sleep(5);
+   
+try {
+    $test = $client->startTest($url);
+    echo $test;
+    var_dump($test->getData());
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
 }
+
 ```
 
 ## Update information
