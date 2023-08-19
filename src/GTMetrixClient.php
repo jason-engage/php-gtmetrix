@@ -188,7 +188,7 @@ class GTMetrixClient
         $test->setData($result);
         
         if ($wait_for_completion) { 
-            error_log("Waiting for test to complete");
+            // error_log("Waiting for test to complete");
             sleep(2);
             $test = $this->waitForTest( $test );
         }
@@ -227,22 +227,22 @@ class GTMetrixClient
             $test = $this->getTest($test->getId()); // Assuming this function fetches the test data
             
             if ( empty($test->getData()) ) {                
-                error_log("Test data is empty?");
+                // error_log("Test data is empty?");
                 break;
             }
 
             if ($test->getState() === GTMetrixTest::STATE_COMPLETED) {
-                error_log("Test is ready");
+                // error_log("Test is ready");
                 continue;
             }
 
-            error_log("Still waiting");
+            // error_log("Still waiting");
             sleep(5);
             $retryCount++;
         }
     
         if ($retryCount >= $maxRetries) {
-            error_log("Max retries reached");
+            // error_log("Max retries reached");
             return $test;
         }
     
