@@ -4,8 +4,6 @@
 
 Fork and ask ChatGPT how to install to composer using custom dev repository
 
-Rebuilt for API 2.0 using philcook/gtmetrix - it is not backwards compatible and will break existing code.
-
 ## Using
 
 ```php
@@ -26,4 +24,4 @@ try {
 
 ## Update information
 
-From version 2.0 references to Entrecore have been replace with LightningStudio due to Entrecore no longer existing and therefore avoiding confusion for users. 
+Rebuilt for API 2.0 using philcook/gtmetrix - it is not backwards compatible and will break existing code.
